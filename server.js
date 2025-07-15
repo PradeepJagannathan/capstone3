@@ -13,7 +13,12 @@ app.listen(port, () => {
   console.log(`Server listening on port ${port}`);
 });
 
-app.get('/customers', async (req, res) => {
-    const customers = await da.getCustomers();
-    res.send(customers);
+app.get("/customers", async (req, res) => {
+     const [cust, err] = await da.getCustomers();
+     if(cust){
+         res.send(cust);
+     }else{
+         res.status(500);
+         res.send(err);
+     }   
 });
