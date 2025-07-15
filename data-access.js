@@ -38,10 +38,26 @@ async function resetCustomers() {
     }
 }
 
+async function addCustomer(newCustomer) {
+    try {
+        const insertResult = await collection.insertOne(newCustomer);
+        // return array [status, id, errMessage]
+        return ["success", insertResult.insertedId, null];
+    } catch (err) {
+        console.log(err.message);
+        return ["fail", null, err.message];
+    }
+}
+
+
 dbStartup()
+    .then(() => console.log("Database connection established"))
+    .catch(err => console.error("Database connection failed:", err));
+    
 module.exports = {
     getCustomers,
-    resetCustomers
+    resetCustomers,
+    addCustomer
 };
 
 
