@@ -49,15 +49,30 @@ async function addCustomer(newCustomer) {
     }
 }
 
+async function getCustomerById(id) {
+    try {
+        const customer = await collection.findOne({"id": +id});
+        // return array [customer, errMessage]
+        if(!customer){
+          return [ null, "invalid customer number"];
+        }
+        return [customer, null];
+    } catch (err) {
+        console.log(err.message);
+        return [null, err.message];
+    }
+}
+
 
 dbStartup()
     .then(() => console.log("Database connection established"))
     .catch(err => console.error("Database connection failed:", err));
-    
+
 module.exports = {
     getCustomers,
     resetCustomers,
-    addCustomer
+    addCustomer,
+    getCustomerById
 };
 
 
