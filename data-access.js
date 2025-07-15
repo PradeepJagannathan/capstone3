@@ -63,6 +63,19 @@ async function getCustomerById(id) {
     }
 }
 
+async function updateCustomer(updatedCustomer) {
+    try {
+        const filter = { "id": updatedCustomer.id };
+        const setData = { $set: updatedCustomer };
+        const updateResult = 
+        await collection.updateOne(filter, setData);
+        // return array [message, errMessage]
+        return ["one record updated", null];
+    } catch (err) {
+        console.log(err.message);
+        return [ null, err.message];
+    }
+}
 
 dbStartup()
     .then(() => console.log("Database connection established"))
@@ -72,7 +85,8 @@ module.exports = {
     getCustomers,
     resetCustomers,
     addCustomer,
-    getCustomerById
+    getCustomerById,
+    updateCustomer
 };
 
 
