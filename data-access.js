@@ -77,6 +77,23 @@ async function updateCustomer(updatedCustomer) {
     }
 }
 
+async function deleteCustomerById(id) {
+    try {
+        const deleteResult = await collection.deleteOne({ "id": +id });
+        if (deleteResult.deletedCount === 0) {
+            // return array [message, errMessage]
+            return [null, "no record deleted"];
+        } else if (deleteResult.deletedCount === 1) {
+            return ["one record deleted", null];
+        } else {
+            return [null, "error deleting records"]
+        }
+    } catch (err) {
+        console.log(err.message);
+        return [null, err.message];
+    }
+}
+
 dbStartup()
     .then(() => console.log("Database connection established"))
     .catch(err => console.error("Database connection failed:", err));
@@ -86,7 +103,8 @@ module.exports = {
     resetCustomers,
     addCustomer,
     getCustomerById,
-    updateCustomer
+    updateCustomer,
+    deleteCustomerById
 };
 
 
