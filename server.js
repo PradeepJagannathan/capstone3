@@ -7,6 +7,7 @@ const port = process.env.PORT || 4000;
 
 const da = require("./data-access");
 const { checkApiKey } = require("./security");
+const getNewApiKey = require("./security").getNewApiKey;
 
 app.use(bodyParser.json());
 
@@ -15,6 +16,17 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.listen(port, () => {
   console.log(`Server listening on port ${port}`);
+});
+
+app.get("/apikey", async (req, res) => {
+    let email = req.query.email;
+    if(email){
+        const newApiKey = getNewApiKey(email);
+        res.send(newApiKey);
+    }else{
+        res.status(400);
+        res.send("an email query param is required");
+    }   
 });
 
 app.get("/customers", checkApiKey, async (req, res) => {
