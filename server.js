@@ -39,6 +39,38 @@ app.get("/customers", checkApiKey, async (req, res) => {
      }   
 });
 
+app.get("/customers/find", async (req, res) => {
+    const keys = Object.keys(req.query);
+    if (keys.length === 0) {
+        res.status(400);
+        res.send("query string is required");
+        return;
+    } 
+
+    if (keys.length > 1) {
+        res.status(400);
+        res.send("only one query string is allowed");
+        return;
+    }
+
+    const key = keys[0];
+    const validKeys = ["id", "name", "email"];
+    if (!validKeys.includes(key)) {
+        res.status(400);
+        res.send("query string must be one of " + validKeys.join(", "));
+        return;
+    }
+    
+    const value = req.query[key];
+    const [cust, err] = await da.findCustomer(key, value);
+    if (cust) {
+        res.send(cust);
+    } else {
+        res.status(404);
+        res.send(err);
+    }
+});
+
 app.get("/reset", checkApiKey, async (req, res) => {
     const [result, err] = await da.resetCustomers();
     if(result){
