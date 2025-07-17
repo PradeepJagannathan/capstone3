@@ -1,4 +1,4 @@
-const express = require('express');
+ const express = require('express');
 const path = require('path');
 const bodyParser = require('body-parser');
 const app = express();
@@ -87,6 +87,23 @@ app.post('/customers', checkApiKey, async (req, res) => {
         res.status(400);
         res.send("missing request body");
     } else {
+
+        const key = "email";
+        const value = newCustomer.email;
+
+        const [cust, err] = await da.findCustomer(key, value);
+        if (cust) {
+            res.status(400);
+            res.send("email already used");
+            return;
+        }
+        
+        if (err && err !== "no matching customer documents found") {
+            res.status(500);
+            res.send(err);
+            return;
+        }
+        
         // return array format [status, id, errMessage]
         const [status, id, errMessage] = await da.addCustomer(newCustomer);
         if (status === "success") {
@@ -116,10 +133,49 @@ app.get("/customers/:id", checkApiKey, async (req, res) => {
 app.put('/customers/:id', checkApiKey, async (req, res) => {
     const id = req.params.id;
     const updatedCustomer = req.body;
+
+    
     if (updatedCustomer === null || req.body == {}) {
         res.status(400);
         res.send("missing request body");
     } else {
+        const updatedCustomerObject = JSON.parse(JSON.stringify(updatedCustomer));
+        console.log("updatedCustomerObject: " + JSON.stringify(updatedCustomerObject));
+        console.log("updatedCustomerObject.id: " + updatedCustomerObject.id);
+        if (id != updatedCustomerObject.id) {
+            res.status(400);
+            res.send("id in path and body do not match");
+            return;
+        }
+
+        const key = "email";
+        const value = updatedCustomer.email;
+
+        const [cust, err] = await da.findCustomer(key, value);
+    
+        //console.log ("cust unstring : " + cust);
+        //console.log("cust: " + JSON.stringify(cust));
+        //console.log("cust.id: " + custObject.id);
+        //console.log("custObject : " + JSON.stringify(custObject));
+        //console.log("cust.id: " + cust.id);
+        //console.log("id: " + id);
+
+        if (cust){
+            const custObject = JSON.parse(JSON.stringify(cust[0]));
+            if (custObject && custObject.id != id) {
+                res.status(400);
+                res.send("email already used - test");
+                return;
+            }
+        }
+
+        
+        if (err && err !== "no matching customer documents found") {
+            res.status(500);
+            res.send(err);
+            return;
+        }
+
         delete updatedCustomer._id;
         // return array format [message, errMessage]
         const [message, errMessage] = await da.updateCustomer(updatedCustomer);

@@ -63,6 +63,20 @@ async function getCustomerById(id) {
     }
 }
 
+async function getCustomerByEmail(email) {
+    try {
+        const customer = await collection.findOne({"email": email});
+        // return array [customer, errMessage]
+        if(!customer){
+          return [null, "email not used"];
+        }
+        return [customer, null];
+    } catch (err) {
+        console.log(err.message);
+        return [null, err.message];
+    }
+}   
+
 async function findCustomer(key, value) {
     try {
         if (key === "id") {
@@ -89,8 +103,8 @@ async function updateCustomer(updatedCustomer) {
     try {
         const filter = { "id": updatedCustomer.id };
         const setData = { $set: updatedCustomer };
-        const updateResult = 
-        await collection.updateOne(filter, setData);
+        const option = { upsert: true }; // insert if not found
+        const updateResult = await collection.updateOne(filter, setData, option);
         // return array [message, errMessage]
         return ["one record updated", null];
     } catch (err) {
@@ -127,7 +141,8 @@ module.exports = {
     getCustomerById,
     updateCustomer,
     deleteCustomerById,
-    findCustomer
+    findCustomer,
+    getCustomerByEmail
 };
 
 

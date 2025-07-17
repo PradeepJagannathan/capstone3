@@ -41,19 +41,19 @@ function setApiKey(){
 
 
 function checkApiKey(req, res, next) {
-    const apiKeyHeader = req.headers['x-api-key'];
+    const apiKeyInput = req.query.api_key || req.headers['x-api-key'];
     // get the key from environment variable or hardcoded for simplicity
     // In production, you should use environment variables for sensitive data
     const apiKey = process.env.API_KEY;
 
-    if (!apiKeyHeader){
+    if (!apiKeyInput){
         res.status(401).json({ message: 'Unauthorized: Missing API key' });
         return;
     }
 
     let keyValid = false;    
     for( let value of apiKeys.values()){
-      if (apiKeyHeader === value){
+      if (apiKeyInput === value){
         keyValid = true;
       }
     }
